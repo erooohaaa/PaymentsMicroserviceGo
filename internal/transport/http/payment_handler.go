@@ -26,11 +26,11 @@ func (h *PaymentHandler) authorize(w http.ResponseWriter, r *http.Request) {
 		Amount  int64  `json:"amount"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		http.Error(w, "invalid request", http.StatusBadRequest)
 		return
 	}
 	if req.OrderID == "" || req.Amount <= 0 {
-		http.Error(w, "order_id and amount > 0 are required", http.StatusBadRequest)
+		http.Error(w, "order_id and amount > 0required", http.StatusBadRequest)
 		return
 	}
 

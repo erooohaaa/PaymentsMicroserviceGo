@@ -26,10 +26,10 @@ func main() {
 	if err := db.Ping(); err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
-	log.Println("Payment Service: connected to database")
+	log.Println("Payment Service connected to database")
 
 	a := app.New(db)
-	log.Println("Payment Service: listening on :8081")
+	log.Println("Payment Service listening on :8081")
 	if err := a.Server.ListenAndServe(); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
