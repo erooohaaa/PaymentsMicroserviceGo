@@ -11,7 +11,6 @@ const (
 	StatusDeclined   PaymentStatus = "Declined"
 )
 
-
 const MaxPaymentAmount int64 = 100000
 
 type Payment struct {

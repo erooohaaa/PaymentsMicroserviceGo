@@ -5,11 +5,13 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"Payments/internal/repository"
 	transportGRPC "Payments/internal/transport/grpc"
 	"Payments/internal/usecase"
-	"github.com/erooohaaa/orders-generated/api"
+
+	api "github.com/erooohaaa/orders-generated"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -18,7 +20,7 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using defaults")
+		log.Println("No .env file found, using environment")
 	}
 
 	dsn := os.Getenv("DB_DSN")
@@ -28,13 +30,14 @@ func main() {
 	}
 	defer db.Close()
 
-	// Инициализация слоев Clean Architecture
+	db.SetMaxOpenConns(10)
+	db.SetConnMaxLifetime(time.Minute * 3)
+
 	paymentRepo := repository.NewPostgresPaymentRepository(db)
 	paymentUC := usecase.NewPaymentUseCase(paymentRepo)
 	grpcHandler := transportGRPC.NewPaymentGRPCHandler(paymentUC)
 
-	// Запуск grpc сервера
-	grpcPort := os.Getenv("GRPC_PORT") // Добавь в .env: GRPC_PORT=50051
+	grpcPort := os.Getenv("GRPC_PORT")
 	if grpcPort == "" {
 		grpcPort = "50051"
 	}
@@ -44,11 +47,13 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(transportGRPC.LoggingInterceptor),
+	)
 	api.RegisterPaymentServiceServer(server, grpcHandler)
 
-	log.Printf("Payment grpc Service listening on %v", grpcPort)
+	log.Printf("Payment gRPC service listening on :%s", grpcPort)
 	if err := server.Serve(lis); err != nil {
-		log.Fatalf("failed to serve grpc: %v", err)
+		log.Fatalf("failed to serve: %v", err)
 	}
 }

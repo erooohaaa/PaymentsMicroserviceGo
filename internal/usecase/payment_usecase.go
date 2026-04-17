@@ -22,9 +22,9 @@ func NewPaymentUseCase(repo PaymentRepository) *PaymentUseCase {
 }
 
 func (uc *PaymentUseCase) Authorize(ctx context.Context, orderID string, amount int64) (*domain.Payment, error) {
-	status := domain.StatusAuthorized
+	payStatus := domain.StatusAuthorized
 	if amount > domain.MaxPaymentAmount {
-		status = domain.StatusDeclined
+		payStatus = domain.StatusDeclined
 	}
 
 	p := &domain.Payment{
@@ -32,7 +32,7 @@ func (uc *PaymentUseCase) Authorize(ctx context.Context, orderID string, amount 
 		OrderID:       orderID,
 		TransactionID: uuid.New().String(),
 		Amount:        amount,
-		Status:        status,
+		Status:        payStatus,
 	}
 
 	if err := uc.repo.Save(ctx, p); err != nil {
