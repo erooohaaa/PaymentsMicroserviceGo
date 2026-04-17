@@ -1,5 +1,8 @@
 # 🛒 Order & Payment Microservices
 
+## https://github.com/erooohaaa/PaymentsMicroserviceGo
+## https://github.com/erooohaaa/orders-proto
+
 > Educational project in Go --- two microservices using Clean
 > Architecture, REST API, and PostgreSQL.
 
